@@ -20,14 +20,14 @@ public class FCITemplate extends EmvData {
      * Dedicated File Name, field name 84.
      */
     @Expose
-    private final String dfName;
+    private String dfName;
     private final static String TAG_DF_NAME = "84";
 
     /**
      * File Control Information Proprietary information, value A5
      */
     @Expose
-    private final FCIProprietaryTemplate fciProprietaryTemplate;
+    private FCIProprietaryTemplate fciProprietaryTemplate;
     private final static String TAG_FCI_PROPRIETARY_TEMPLATE = "A5";
 
     public FCITemplate(byte[] response) {
@@ -37,9 +37,6 @@ public class FCITemplate extends EmvData {
             parseTLVResponse(response, new String[]{TAG_DF_NAME, TAG_FCI_PROPRIETARY_TEMPLATE}, parsedResponse);
             this.dfName = ByteString.byteArrayToHexString(parsedResponse.get(TAG_DF_NAME));
             this.fciProprietaryTemplate = new FCIProprietaryTemplate(parsedResponse.get(TAG_FCI_PROPRIETARY_TEMPLATE));
-        } else {
-            this.dfName = null;
-            this.fciProprietaryTemplate = null;
         }
     }
 

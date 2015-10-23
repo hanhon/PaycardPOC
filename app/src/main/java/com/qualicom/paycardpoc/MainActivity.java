@@ -17,8 +17,10 @@ import android.widget.Toast;
 
 import com.qualicom.emvpaycard.EmvPayCardException;
 import com.qualicom.emvpaycard.controller.PayCardController;
+import com.qualicom.emvpaycard.controller.ReadRecordController;
 import com.qualicom.emvpaycard.controller.SelectController;
 import com.qualicom.emvpaycard.model.SelectResponse;
+import com.qualicom.emvpaycard.utils.ByteString;
 import com.qualicom.emvpaycard.utils.EmvCommand;
 import com.qualicom.emvpaycard.utils.EmvPayCardUtils;
 import com.qualicom.emvpaycard.enums.EmvCommandEnum;
@@ -88,8 +90,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("RESPONSE", response.toString());
                 response = selectController.selectDDF(SelectController.PPSE);
                 Log.i("RESPONSE", response.toString());
-                response = selectController.selectADF(new byte[] { (byte)(0xA0 & 0xff), 0x00, 0x00, 0x00, 0x04, 0x10, 0x10 }); //Mastercard.
+                String appId = response.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().get(0).getAdfName();
+                response = selectController.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
                 Log.i("RESPONSE", response.toString());
+//                ReadRecordController readRecordController = new ReadRecordController(payCardController);
+//                readRecordController.readPSERecord();
                 payCardController.disconnect();
 
             } else

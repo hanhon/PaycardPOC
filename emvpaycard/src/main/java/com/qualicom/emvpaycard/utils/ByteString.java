@@ -38,4 +38,16 @@ public class ByteString {
         if (hexString.length() == 1) hexString = "0" + hexString;
         return hexString.toUpperCase();
     }
+
+    public static byte hexStringToByte(String hexString) {
+        return (byte)(Integer.parseInt(hexString, 16) & 0xff);
+    }
+
+    public static byte[] hexStringToByteArray(String hexString) {
+        byte[] array = new byte[hexString.length() / 2];
+        for(int i=0; i<hexString.length() / 2; i++) {
+            array[i] = hexStringToByte(hexString.substring(2 * i, 2 * i + 2));
+        }
+        return array;
+    }
 }

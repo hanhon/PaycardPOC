@@ -10,14 +10,13 @@ import java.util.Map;
  */
 public class SelectResponse extends EmvResponse {
 
-    private final static String RECORD_NOT_EXIST_STATUS_CODE="6A";
-    private final static String RECORD_FOUND_STATUS_CODE="90";
+    public final static String RECORD_NOT_EXIST_STATUS_CODE="6A";
 
     /*
     File Control Information field, field name 6F
      */
     @Expose
-    private final FCITemplate fciTemplate;
+    private FCITemplate fciTemplate;
     private final static String TAG_FCI_TEMPLATE = "6F";
 
     public SelectResponse(byte[] response) {
@@ -31,8 +30,6 @@ public class SelectResponse extends EmvResponse {
             } else {
                 this.fciTemplate = null;
             }
-        } else {
-            this.fciTemplate = null;
         }
     }
 
@@ -45,6 +42,6 @@ public class SelectResponse extends EmvResponse {
     }
 
     public boolean isRecordFound() {
-        return RECORD_FOUND_STATUS_CODE.equals(getProcessingStatus());
+        return isSuccessfulResponse();
     }
 }

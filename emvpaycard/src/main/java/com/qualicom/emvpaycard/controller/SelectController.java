@@ -11,18 +11,14 @@ import com.qualicom.emvpaycard.utils.EmvCommand;
 /**
  * Created by kangelov on 2015-10-18.
  */
-public class SelectController {
-
-    private final PayCardController payCardController;
+public class SelectController extends CommandController {
 
     public static final byte[] PPSE = "2PAY.SYS.DDF01".getBytes(); //used for Proximity interfaces.
     public static final byte[] PSE = "1PAY.SYS.DDF01".getBytes(); //used for EMV interfaces. This isn't used right now, no Android phone has a chipcard reader.
 
 
     public SelectController(PayCardController payCardController) throws EmvPayCardException {
-        if (payCardController == null || !payCardController.isConnected())
-            throw new EmvPayCardException("Invalid or null payCardController object passed.");
-        this.payCardController = payCardController;
+        super(payCardController);
     }
 
     /**
@@ -33,7 +29,7 @@ public class SelectController {
      */
     public SelectResponse selectPSE() throws EmvPayCardException {
         EmvCommand selectCommand = new EmvCommand(EmvCommandEnum.SELECT, null, 0);
-        byte[] response = payCardController.transcieve(selectCommand);
+        byte[] response = getPayCardController().transcieve(selectCommand);
         return new SelectResponse(response);
     }
 
@@ -45,13 +41,14 @@ public class SelectController {
      */
     public SelectResponse selectDDF(byte[] dfName) throws EmvPayCardException {
         EmvCommand selectCommand = new EmvCommand(EmvCommandEnum.SELECT, dfName, 0);
-        byte[] response = payCardController.transcieve(selectCommand);
+        byte[] response = getPayCardController().transcieve(selectCommand);
         return new SelectResponse(response);
     }
 
     public SelectResponse selectADF(byte[] application) throws EmvPayCardException {
         EmvCommand selectCommand = new EmvCommand(EmvCommandEnum.SELECT, application, 0);
-        byte[] response = payCardController.transcieve(selectCommand);
+        byte[] response = getPayCardController().transcieve(selectCommand);
         return new SelectResponse(response);
     }
+
 }

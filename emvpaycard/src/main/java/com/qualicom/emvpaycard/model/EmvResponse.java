@@ -12,26 +12,29 @@ import java.util.Map;
 /**
  * Created by kangelov on 2015-10-18.
  */
-public abstract class EmvResponse extends EmvData {
+public class EmvResponse extends EmvData {
+
+    public final static String SUCCESS_STATUS_CODE="90";
+    public final static String SUCCESS_QUALIFIER_CODE = "00";
 
     /**
      * Contains the raw data portion of the raw response.
      */
-    private final byte[] data;
+    private byte[] data;
 
     /**
      * Contains the processing status byte of the raw response.
      * Always store unsigned bytes as strings to prevent Java from tampering with them.
      */
     @Expose
-    private final String processingStatus;
+    private String processingStatus;
 
     /**
      * Contains the processing qualifier byte of the raw response.
      * Always store unsigned bytes as strings to prevent Java from tampering with them.
      */
     @Expose
-    private final String processingQualifier;
+    private String processingQualifier;
 
     public EmvResponse(byte[] raw) {
         super(raw);
@@ -39,10 +42,6 @@ public abstract class EmvResponse extends EmvData {
             this.data = Arrays.copyOfRange(raw, 0, raw.length - 2);
             this.processingStatus = ByteString.byteToHexString(raw[raw.length - 2]);
             this.processingQualifier = ByteString.byteToHexString(raw[raw.length - 1]);
-        } else {
-            this.data = null;
-            this.processingQualifier = null;
-            this.processingStatus = null;
         }
     }
 
@@ -56,5 +55,9 @@ public abstract class EmvResponse extends EmvData {
 
     public String getProcessingStatus() {
         return processingStatus;
+    }
+
+    public boolean isSuccessfulResponse() {
+        return SUCCESS_STATUS_CODE.equals(getProcessingStatus()) && SUCCESS_QUALIFIER_CODE.equalsIgnoreCase(getProcessingQualifier());
     }
 }

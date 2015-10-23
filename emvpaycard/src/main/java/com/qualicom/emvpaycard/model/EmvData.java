@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.qualicom.emvpaycard.utils.ByteString;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +48,27 @@ public abstract class EmvData {
                 int length = response[parsePos++];
                 byte[] data = Arrays.copyOfRange(response, parsePos, parsePos + length);
                 parsedResponse.put(prefix.toString(), data);
+                startPos = parsePos = parsePos + length;
+                prefix = new StringBuffer();
+            } else {
+                if (parsePos >= response.length) {
+                    parsePos = ++startPos;
+                    prefix = new StringBuffer();
+                }
+            }
+        }
+    }
+
+    static void parseTLVList(byte[] response, String tag, List<byte[]> parsedList) {
+        int startPos = 0;
+        int parsePos = 0;
+        StringBuffer prefix = new StringBuffer();
+        while (startPos < response.length) {
+            prefix.append(ByteString.byteToHexString(response[parsePos++]));
+            if (tag.contains(prefix.toString())) {
+                int length = response[parsePos++];
+                byte[] data = Arrays.copyOfRange(response, parsePos, parsePos + length);
+                parsedList.add(data);
                 startPos = parsePos = parsePos + length;
                 prefix = new StringBuffer();
             } else {

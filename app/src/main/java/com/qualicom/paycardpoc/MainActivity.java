@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("RESPONSE", response.toString());
                 response = selectController.selectDDF(SelectController.PPSE);
                 Log.i("RESPONSE", response.toString());
-                String appId = response.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().get(0).getAdfName();
+                String appId = response.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0).getAdfName();
                 response = selectController.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
                 Log.i("RESPONSE", response.toString());
 //                ReadRecordController readRecordController = new ReadRecordController(payCardController);

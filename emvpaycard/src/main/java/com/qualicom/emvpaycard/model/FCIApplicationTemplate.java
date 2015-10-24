@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Created by kangelov on 2015-10-23.
  */
-public class FCIDirectoryEntry extends EmvData {
+public class FCIApplicationTemplate extends EmvData {
 
     @Expose
     private String adfName;
@@ -33,7 +33,7 @@ public class FCIDirectoryEntry extends EmvData {
     private static final String TAG_EXTENDED_SELECTION = "9F29";
 
 
-    public FCIDirectoryEntry(byte[] response) {
+    public FCIApplicationTemplate(byte[] response) {
         super(response);
         if (response != null) {
             Map<String, byte[]> parsedResponse = new HashMap<String, byte[]>();

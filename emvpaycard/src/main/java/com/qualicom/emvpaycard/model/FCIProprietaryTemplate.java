@@ -1,7 +1,5 @@
 package com.qualicom.emvpaycard.model;
 
-import android.text.TextUtils;
-
 import com.google.gson.annotations.Expose;
 import com.qualicom.emvpaycard.utils.ByteString;
 
@@ -40,10 +38,8 @@ public class FCIProprietaryTemplate extends EmvData {
      * Issuer discretionary data, value BF0C
      */
     @Expose
-    private List<FCIDirectoryEntry> issuerDiscretionaryData;
+    private FCIIssuerDiscretionaryData issuerDiscretionaryData;
     private static final String TAG_ISSUER_DISCRETIONARY_DATA = "BF0C";
-    private static final String TAG_FCI_DISCRETIONARY_ENTRIES = "61";
-
 
     /**
      * Application label, value 50
@@ -91,12 +87,7 @@ public class FCIProprietaryTemplate extends EmvData {
             this.applicationPreferredName = ByteString.byteArrayToUTF8String(parsedResponse.get(TAG_APPLICATION_PREFERRED_NAME));
             this.applicationPriorityIndicator = ByteString.byteArrayToHexString(parsedResponse.get(TAG_APPLICATION_PRIORITY_INDICATOR));
             this.issuerCodeTableIndex = ByteString.byteArrayToHexString(parsedResponse.get(TAG_ISSUER_CODE_TABLE_INDEX));
-            this.issuerDiscretionaryData = new ArrayList<FCIDirectoryEntry>();
-            List<byte[]> parsedList = new ArrayList<byte[]>();
-            parseTLVList(response, TAG_FCI_DISCRETIONARY_ENTRIES, parsedList);
-            for(byte[] entry : parsedList) {
-                this.issuerDiscretionaryData.add(new FCIDirectoryEntry(entry));
-            }
+            this.issuerDiscretionaryData = new FCIIssuerDiscretionaryData(parsedResponse.get(TAG_ISSUER_DISCRETIONARY_DATA));
             this.languagePreference = ByteString.byteArrayToUTF8String(parsedResponse.get(TAG_LANGUAGE_PREFERENCE));
             this.pdol = ByteString.byteArrayToHexString(parsedResponse.get(TAG_PDOL));
             this.sfiFileName = ByteString.byteArrayToUTF8String(parsedResponse.get(TAG_SFI_FILENAME));
@@ -119,7 +110,7 @@ public class FCIProprietaryTemplate extends EmvData {
         return issuerCodeTableIndex;
     }
 
-    public List<FCIDirectoryEntry> getIssuerDiscretionaryData() {
+    public FCIIssuerDiscretionaryData getIssuerDiscretionaryData() {
         return issuerDiscretionaryData;
     }
 

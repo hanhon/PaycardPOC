@@ -5,7 +5,7 @@ import com.qualicom.emvpaycard.utils.ByteString;
 /**
  * Created by kangelov on 2015-10-23.
  */
-public enum KernelType {
+public enum KernelTypeEnum {
 
     INTERNATIONAL_KERNEL((byte)0x00, "International Kernel"),
     DOMESTIC_KERNEL((byte)0x80, "Domestic Kernel"),
@@ -14,7 +14,7 @@ public enum KernelType {
     private final byte kernelType;
     private final String description;
 
-    private KernelType(byte kernelType, String description) {
+    private KernelTypeEnum(byte kernelType, String description) {
         this.kernelType = kernelType;
         this.description = description;
     }

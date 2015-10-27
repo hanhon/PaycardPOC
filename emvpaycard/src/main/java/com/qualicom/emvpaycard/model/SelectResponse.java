@@ -21,15 +21,12 @@ public class SelectResponse extends EmvResponse {
 
     public SelectResponse(byte[] response) {
         super(response);
-        if (getData() != null && getData().length > 0) {
+        if (getData() != null && getData().length > 0 && isRecordFound()) {
             //Take the last 2 bytes of the response as a response code.
-            if (isRecordFound()) {
-                Map<String, byte[]> parsedResponse = new HashMap<String, byte[]>();
-                parseTLVResponse(getData(), new String[]{TAG_FCI_TEMPLATE}, parsedResponse);
+            Map<String, byte[]> parsedResponse = new HashMap<String, byte[]>();
+            parseTLVResponse(getData(), new String[]{TAG_FCI_TEMPLATE}, parsedResponse);
+            if (parsedResponse.containsKey(TAG_FCI_TEMPLATE))
                 this.fciTemplate = new FCITemplate(parsedResponse.get(TAG_FCI_TEMPLATE));
-            } else {
-                this.fciTemplate = null;
-            }
         }
     }
 

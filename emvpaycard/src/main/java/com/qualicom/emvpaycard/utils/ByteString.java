@@ -5,6 +5,11 @@ package com.qualicom.emvpaycard.utils;
  */
 public class ByteString {
 
+    /**
+     * Use for display purposes only. Use byteArrayToHexString for everything else.
+     * @param stream
+     * @return
+     */
     public static String printByteStream(byte[] stream) {
         StringBuffer buffer = new StringBuffer();
         if (stream != null) {
@@ -40,10 +45,12 @@ public class ByteString {
     }
 
     public static byte hexStringToByte(String hexString) {
+        hexString = hexString.replaceAll("\\s", ""); //strip any whitespaces that may have been added for readability.
         return (byte)(Integer.parseInt(hexString, 16) & 0xff);
     }
 
     public static byte[] hexStringToByteArray(String hexString) {
+        hexString = hexString.replaceAll("\\s", ""); //strip any whitespaces that may have been added for readability.
         byte[] array = new byte[hexString.length() / 2];
         for(int i=0; i<hexString.length() / 2; i++) {
             array[i] = hexStringToByte(hexString.substring(2 * i, 2 * i + 2));

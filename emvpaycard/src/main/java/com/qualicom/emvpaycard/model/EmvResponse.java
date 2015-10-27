@@ -57,6 +57,15 @@ public class EmvResponse extends EmvData {
         return processingStatus;
     }
 
+    /**
+     * The status word is composed of the processing status + the processing qualifier. It is a
+     * composite field provided for convenience.
+     * @return
+     */
+    public String getStatusWord() {
+        return getProcessingStatus() + getProcessingQualifier();
+    }
+
     public boolean isSuccessfulResponse() {
         return SUCCESS_STATUS_CODE.equals(getProcessingStatus()) && SUCCESS_QUALIFIER_CODE.equalsIgnoreCase(getProcessingQualifier());
     }

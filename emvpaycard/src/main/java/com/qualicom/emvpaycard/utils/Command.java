@@ -1,8 +1,12 @@
 package com.qualicom.emvpaycard.utils;
 
-import com.qualicom.emvpaycard.enums.EmvCommandEnum;
+import com.qualicom.emvpaycard.enums.CommandEnum;
 
-public class EmvCommand {
+/**
+ * Credits: https://github.com/devnied/EMV-NFC-Paycard-Enrollment/blob/master/library/src/main/java/com/github/devnied/emvnfccard/utils/CommandApdu.java
+ *
+ */
+public class Command {
 
     protected int mCla = 0x00;
 
@@ -20,7 +24,7 @@ public class EmvCommand {
 
     protected boolean mLeUsed = false;
 
-    public EmvCommand(final EmvCommandEnum pEnum, final byte[] data, final int le) {
+    public Command(final CommandEnum pEnum, final byte[] data, final int le) {
         mCla = pEnum.getCla();
         mIns = pEnum.getIns();
         mP1 = pEnum.getP1();
@@ -31,7 +35,7 @@ public class EmvCommand {
         mLeUsed = true;
     }
 
-    public EmvCommand(final EmvCommandEnum pEnum, final int p1, final int p2, final int le) {
+    public Command(final CommandEnum pEnum, final int p1, final int p2, final int le) {
         mCla = pEnum.getCla();
         mIns = pEnum.getIns();
         mP1 = p1;
@@ -40,7 +44,7 @@ public class EmvCommand {
         mLeUsed = true;
     }
 
-    public EmvCommand(final EmvCommandEnum pEnum, final int p1, final int p2) {
+    public Command(final CommandEnum pEnum, final int p1, final int p2) {
         mCla = pEnum.getCla();
         mIns = pEnum.getIns();
         mP1 = p1;

@@ -6,8 +6,8 @@ import android.util.Log;
 
 import com.qualicom.emvpaycard.EmvPayCardException;
 import com.qualicom.emvpaycard.utils.ByteString;
-import com.qualicom.emvpaycard.utils.EmvCommand;
-import com.qualicom.emvpaycard.utils.EmvPayCardUtils;
+import com.qualicom.emvpaycard.utils.Command;
+import com.qualicom.emvpaycard.utils.PayCardUtils;
 
 import java.io.IOException;
 
@@ -24,7 +24,7 @@ public class PayCardController {
 
     public PayCardController(Tag tag) throws EmvPayCardException {
         this.tag = tag;
-        if (!EmvPayCardUtils.isValidEmvPayCard(tag))
+        if (!PayCardUtils.isValidEmvPayCard(tag))
             throw new EmvPayCardException("Tag is not a valid payment card.");
         this.isoDepTag = IsoDep.get(tag);
     }
@@ -54,7 +54,7 @@ public class PayCardController {
         disconnect();
     }
 
-    public byte[] transcieve(EmvCommand command) throws EmvPayCardException {
+    public byte[] transcieve(Command command) throws EmvPayCardException {
         if (!isConnected) throw new EmvPayCardException("Tag not connected.");
         try {
             Log.i("SEND", ByteString.printByteStream(command.toBytes()));

@@ -1,7 +1,8 @@
 package com.qualicom.emvpaycard.model;
 
 import com.google.gson.annotations.Expose;
-import com.qualicom.emvpaycard.enums.KernelType;
+import com.qualicom.emvpaycard.enums.KernelEnum;
+import com.qualicom.emvpaycard.enums.KernelTypeEnum;
 import com.qualicom.emvpaycard.utils.ByteString;
 
 import java.util.HashMap;
@@ -106,6 +107,7 @@ public class FCIApplicationTemplate extends EmvData {
     }
 
     class KernelIdentifier {
+
         @Expose
         private byte kernelIdentifier = 0;
 
@@ -115,20 +117,24 @@ public class FCIApplicationTemplate extends EmvData {
             }
         }
 
-        public KernelType getKernelType() {
-            for (KernelType kernel : KernelType.values()) {
+        public KernelTypeEnum getKernelType() {
+            for (KernelTypeEnum kernel : KernelTypeEnum.values()) {
                 if ((kernelIdentifier & (byte)0xC0) == kernel.getKernelType())
                     return kernel;
             }
             return null;
         }
 
-        public int getKernelID() {
-            return kernelIdentifier & 0x3F;
+        public KernelEnum getKernel() {
+            return KernelEnum.parseValue(kernelIdentifier & 0x3F);
         }
 
         public boolean isDefaultKernelForADF() {
-            return getKernelID() == 0;
+            return getKernel() == KernelEnum.DEFAULT;
+        }
+
+        public byte getKernelIdentifier() {
+            return kernelIdentifier;
         }
 
         @Override

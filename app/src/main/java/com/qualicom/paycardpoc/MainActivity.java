@@ -3,7 +3,6 @@ package com.qualicom.paycardpoc;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.IsoDep;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,13 +18,10 @@ import com.qualicom.emvpaycard.EmvPayCardException;
 import com.qualicom.emvpaycard.controller.PayCardController;
 import com.qualicom.emvpaycard.controller.ReadRecordController;
 import com.qualicom.emvpaycard.controller.SelectController;
+import com.qualicom.emvpaycard.model.ReadResponse;
 import com.qualicom.emvpaycard.model.SelectResponse;
 import com.qualicom.emvpaycard.utils.ByteString;
-import com.qualicom.emvpaycard.utils.EmvCommand;
-import com.qualicom.emvpaycard.utils.EmvPayCardUtils;
-import com.qualicom.emvpaycard.enums.EmvCommandEnum;
-
-import java.io.IOException;
+import com.qualicom.emvpaycard.utils.PayCardUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -77,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
             Tag tag = (Tag)intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             Toast toast = null;
 
-            if (EmvPayCardUtils.isValidEmvPayCard(tag)) {
-                if (EmvPayCardUtils.isTypeAPayCard(tag))
+            if (PayCardUtils.isValidEmvPayCard(tag)) {
+                if (PayCardUtils.isTypeAPayCard(tag))
                     toast = Toast.makeText(this, "This is a valid NFC type A payment card.", Toast.LENGTH_SHORT);
-                if (EmvPayCardUtils.isTypeBPayCard(tag))
+                if (PayCardUtils.isTypeBPayCard(tag))
                     toast = Toast.makeText(this, "This is a valid NFC type A payment card.", Toast.LENGTH_SHORT);
 
                 PayCardController payCardController = new PayCardController(tag);
@@ -93,8 +89,17 @@ public class MainActivity extends AppCompatActivity {
                 String appId = response.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0).getAdfName();
                 response = selectController.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
                 Log.i("RESPONSE", response.toString());
-//                ReadRecordController readRecordController = new ReadRecordController(payCardController);
-//                readRecordController.readPSERecord();
+
+                ReadRecordController readRecordController = new ReadRecordController(payCardController);
+                ReadResponse readResponse = readRecordController.readSFI("1");
+                Log.i("RESPONSE", readResponse.toString());
+
+                Log.i("DATA", "Found card " + readResponse.getApplicationData().getCardNumber());
+                Log.i("DATA", "Found expiration year " + readResponse.getApplicationData().getExpirationYear());
+                Log.i("DATA", "Found expiration month " + readResponse.getApplicationData().getExpirationMonth());
+                Log.i("DATA", "Found service code " + readResponse.getApplicationData().getServiceCode());
+                Log.i("DATA", "Found cardholder name " + readResponse.getApplicationData().getCardholderName());
+
                 payCardController.disconnect();
 
             } else

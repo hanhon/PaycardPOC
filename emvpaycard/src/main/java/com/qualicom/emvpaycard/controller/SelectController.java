@@ -1,12 +1,9 @@
 package com.qualicom.emvpaycard.controller;
 
-import android.nfc.Tag;
-import android.nfc.tech.IsoDep;
-
 import com.qualicom.emvpaycard.EmvPayCardException;
-import com.qualicom.emvpaycard.enums.EmvCommandEnum;
+import com.qualicom.emvpaycard.enums.CommandEnum;
 import com.qualicom.emvpaycard.model.SelectResponse;
-import com.qualicom.emvpaycard.utils.EmvCommand;
+import com.qualicom.emvpaycard.utils.Command;
 
 /**
  * Created by kangelov on 2015-10-18.
@@ -28,7 +25,7 @@ public class SelectController extends CommandController {
      * @throws EmvPayCardException
      */
     public SelectResponse selectPSE() throws EmvPayCardException {
-        EmvCommand selectCommand = new EmvCommand(EmvCommandEnum.SELECT, null, 0);
+        Command selectCommand = new Command(CommandEnum.SELECT, null, 0);
         byte[] response = getPayCardController().transcieve(selectCommand);
         return new SelectResponse(response);
     }
@@ -40,13 +37,13 @@ public class SelectController extends CommandController {
      * @throws EmvPayCardException
      */
     public SelectResponse selectDDF(byte[] dfName) throws EmvPayCardException {
-        EmvCommand selectCommand = new EmvCommand(EmvCommandEnum.SELECT, dfName, 0);
+        Command selectCommand = new Command(CommandEnum.SELECT, dfName, 0);
         byte[] response = getPayCardController().transcieve(selectCommand);
         return new SelectResponse(response);
     }
 
     public SelectResponse selectADF(byte[] application) throws EmvPayCardException {
-        EmvCommand selectCommand = new EmvCommand(EmvCommandEnum.SELECT, application, 0);
+        Command selectCommand = new Command(CommandEnum.SELECT, application, 0);
         byte[] response = getPayCardController().transcieve(selectCommand);
         return new SelectResponse(response);
     }

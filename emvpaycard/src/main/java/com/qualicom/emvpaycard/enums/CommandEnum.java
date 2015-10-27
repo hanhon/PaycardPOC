@@ -1,9 +1,12 @@
 package com.qualicom.emvpaycard.enums;
 
 /**
+ *
+ * Credits: https://github.com/devnied/EMV-NFC-Paycard-Enrollment/blob/master/library/src/main/java/com/github/devnied/emvnfccard/enums/CommandEnum.java
+ *
  * Created by kangelov on 2015-10-16.
  */
-public enum EmvCommandEnum {
+public enum CommandEnum {
 
     /**
      * Select command
@@ -57,7 +60,7 @@ public enum EmvCommandEnum {
      * @param p2
      *            parameter 2
      */
-    private EmvCommandEnum(final int cla, final int ins, final int p1, final int p2) {
+    private CommandEnum(final int cla, final int ins, final int p1, final int p2) {
         this.cla = cla;
         this.ins = ins;
         this.p1 = p1;

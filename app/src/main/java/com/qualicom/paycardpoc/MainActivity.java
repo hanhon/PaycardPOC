@@ -17,10 +17,10 @@ import android.widget.Toast;
 
 import com.qualicom.emvpaycard.EmvPayCardException;
 import com.qualicom.emvpaycard.business.CardData;
-import com.qualicom.emvpaycard.controller.GetProcessingOptionsController;
-import com.qualicom.emvpaycard.controller.PayCardController;
-import com.qualicom.emvpaycard.controller.ReadRecordController;
-import com.qualicom.emvpaycard.controller.SelectController;
+import com.qualicom.emvpaycard.command.GetProcessingOptionsCommand;
+import com.qualicom.emvpaycard.command.PayCardCommand;
+import com.qualicom.emvpaycard.command.ReadRecordCommand;
+import com.qualicom.emvpaycard.command.SelectCommand;
 import com.qualicom.emvpaycard.data.GetProcessingOptionsResponse;
 import com.qualicom.emvpaycard.data.ReadResponse;
 import com.qualicom.emvpaycard.data.SelectResponse;
@@ -83,32 +83,32 @@ public class MainActivity extends AppCompatActivity {
                 if (PayCardUtils.isTypeBPayCard(tag))
                     toast = Toast.makeText(this, "This is a valid NFC type A payment card.", Toast.LENGTH_SHORT);
 
-                PayCardController payCardController = new PayCardController(tag);
-                payCardController.connect();
-                SelectController selectController = new SelectController(payCardController);
-                SelectResponse pseResponse = selectController.selectPSE();
+                PayCardCommand payCardCommand = new PayCardCommand(tag);
+                payCardCommand.connect();
+                SelectCommand selectCommand = new SelectCommand(payCardCommand);
+                SelectResponse pseResponse = selectCommand.selectPSE();
                 Log.i("PSE RESPONSE", pseResponse.toString());
-                SelectResponse ddfResponse = selectController.selectDDF(SelectController.PPSE);
+                SelectResponse ddfResponse = selectCommand.selectDDF(SelectCommand.PPSE);
                 Log.i("DDF RESPONSE", ddfResponse.toString());
                 String appId = ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0).getAdfName();
-                SelectResponse appResponse = selectController.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
+                SelectResponse appResponse = selectCommand.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
                 Log.i("APP RESPONSE", appResponse.toString());
 
-                GetProcessingOptionsController gpoController = new GetProcessingOptionsController(payCardController);
+                GetProcessingOptionsCommand gpoController = new GetProcessingOptionsCommand(payCardCommand);
                 GetProcessingOptionsResponse gpoResponse = gpoController.getApplicationProfile("8300");
                 Log.i("GPO RESPONSE", gpoResponse.toString());
 
-                ReadRecordController readRecordController = new ReadRecordController(payCardController);
+                ReadRecordCommand readRecordCommand = new ReadRecordCommand(payCardCommand);
                 ReadResponse readResponse = null;
                 if (gpoResponse.isSuccessfulResponse()) {
-                    readResponse = readRecordController.readRecord(
+                    readResponse = readRecordCommand.readRecord(
                             gpoResponse.getApplicationFileLocator().getFirstRecordNum(),
                             gpoResponse.getApplicationFileLocator().getShortFileIdentifier(),
                             (byte) (gpoResponse.getApplicationFileLocator().getLastRecordNum() - gpoResponse.getApplicationFileLocator().getFirstRecordNum())
                     );
                     Log.i("RR RESPONSE", readResponse.toString());
                 } else {
-                    readResponse = readRecordController.readRecord(
+                    readResponse = readRecordCommand.readRecord(
                             (byte)01,
                             (byte)01,
                             (byte)00);
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-                payCardController.disconnect();
+                payCardCommand.disconnect();
 
             } else
                 toast = Toast.makeText(this, "This is an invalid or unknown payment card.", Toast.LENGTH_SHORT);

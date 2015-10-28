@@ -1,4 +1,4 @@
-package com.qualicom.emvpaycard.controller;
+package com.qualicom.emvpaycard.command;
 
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
@@ -16,13 +16,13 @@ import java.io.IOException;
  *
  * Created by kangelov on 2015-10-18.
  */
-public class PayCardController {
+public class PayCardCommand {
 
     private final Tag tag;
     private final IsoDep isoDepTag;
     private boolean isConnected = false;
 
-    public PayCardController(Tag tag) throws EmvPayCardException {
+    public PayCardCommand(Tag tag) throws EmvPayCardException {
         this.tag = tag;
         if (!PayCardUtils.isValidEmvPayCard(tag))
             throw new EmvPayCardException("Tag is not a valid payment card.");

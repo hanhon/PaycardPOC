@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 public enum CardSchemeEnum {
 
     VISA("VISA", "^4[0-9]{6,}$", KernelEnum.TYPE_3, "A000000003", "A0000000031010", "A0000000980848"), //
-    MASTER_CARD("Master card", "^5[1-5][0-9]{5,}$", KernelEnum.TYPE_2, "A000000004", "A000000005"), //
-    AMERICAN_EXPRESS("American express", "^3[47][0-9]{5,}$", KernelEnum.TYPE_4, "A000000025"), //
+    MASTER_CARD("Mastercard", "^5[1-5][0-9]{5,}$", KernelEnum.TYPE_2, "A000000004", "A000000005"), //
+    AMERICAN_EXPRESS("American Express", "^3[47][0-9]{5,}$", KernelEnum.TYPE_4, "A000000025"), //
     CB("CB", null, null, "A000000042"), //
     LINK("LINK", null, null, "A000000029"), //
     JCB("JCB", "^(?:2131|1800|35[0-9]{3})[0-9]{3,}$", KernelEnum.TYPE_5, "A000000065"), //
@@ -162,4 +162,7 @@ public enum CardSchemeEnum {
         return aidsByte;
     }
 
+    public KernelEnum getDefaultKernelId() {
+        return defaultKernelId;
+    }
 }

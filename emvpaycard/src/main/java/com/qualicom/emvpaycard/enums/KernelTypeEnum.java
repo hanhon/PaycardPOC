@@ -1,5 +1,6 @@
 package com.qualicom.emvpaycard.enums;
 
+import com.google.gson.annotations.Expose;
 import com.qualicom.emvpaycard.utils.ByteString;
 
 /**
@@ -11,7 +12,10 @@ public enum KernelTypeEnum {
     DOMESTIC_KERNEL((byte)0x80, "Domestic Kernel"),
     PROPRIETARY_DOMESTIC_KERNEL((byte)0xC0, "Domestic Kernel with Proprietary Kernel Identifier");
 
+    @Expose
     private final byte kernelType;
+
+    @Expose
     private final String description;
 
     private KernelTypeEnum(byte kernelType, String description) {
@@ -27,8 +31,4 @@ public enum KernelTypeEnum {
         return kernelType;
     }
 
-    @Override
-    public String toString() {
-        return ByteString.byteToHexString(kernelType);
-    }
 }

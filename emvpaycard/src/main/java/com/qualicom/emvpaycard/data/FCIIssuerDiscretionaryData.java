@@ -1,4 +1,4 @@
-package com.qualicom.emvpaycard.model;
+package com.qualicom.emvpaycard.data;
 
 import com.google.gson.annotations.Expose;
 import com.qualicom.emvpaycard.utils.ByteString;

@@ -12,14 +12,18 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qualicom.emvpaycard.EmvPayCardException;
+import com.qualicom.emvpaycard.business.CardData;
+import com.qualicom.emvpaycard.controller.GetProcessingOptionsController;
 import com.qualicom.emvpaycard.controller.PayCardController;
 import com.qualicom.emvpaycard.controller.ReadRecordController;
 import com.qualicom.emvpaycard.controller.SelectController;
-import com.qualicom.emvpaycard.model.ReadResponse;
-import com.qualicom.emvpaycard.model.SelectResponse;
+import com.qualicom.emvpaycard.data.GetProcessingOptionsResponse;
+import com.qualicom.emvpaycard.data.ReadResponse;
+import com.qualicom.emvpaycard.data.SelectResponse;
 import com.qualicom.emvpaycard.utils.ByteString;
 import com.qualicom.emvpaycard.utils.PayCardUtils;
 
@@ -82,23 +86,44 @@ public class MainActivity extends AppCompatActivity {
                 PayCardController payCardController = new PayCardController(tag);
                 payCardController.connect();
                 SelectController selectController = new SelectController(payCardController);
-                SelectResponse response = selectController.selectPSE();
-                Log.i("RESPONSE", response.toString());
-                response = selectController.selectDDF(SelectController.PPSE);
-                Log.i("RESPONSE", response.toString());
-                String appId = response.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0).getAdfName();
-                response = selectController.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
-                Log.i("RESPONSE", response.toString());
+                SelectResponse pseResponse = selectController.selectPSE();
+                Log.i("PSE RESPONSE", pseResponse.toString());
+                SelectResponse ddfResponse = selectController.selectDDF(SelectController.PPSE);
+                Log.i("DDF RESPONSE", ddfResponse.toString());
+                String appId = ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0).getAdfName();
+                SelectResponse appResponse = selectController.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
+                Log.i("APP RESPONSE", appResponse.toString());
+
+                GetProcessingOptionsController gpoController = new GetProcessingOptionsController(payCardController);
+                GetProcessingOptionsResponse gpoResponse = gpoController.getApplicationProfile("8300");
+                Log.i("GPO RESPONSE", gpoResponse.toString());
 
                 ReadRecordController readRecordController = new ReadRecordController(payCardController);
-                ReadResponse readResponse = readRecordController.readSFI("1");
-                Log.i("RESPONSE", readResponse.toString());
+                ReadResponse readResponse = null;
+                if (gpoResponse.isSuccessfulResponse()) {
+                    readResponse = readRecordController.readRecord(
+                            gpoResponse.getApplicationFileLocator().getFirstRecordNum(),
+                            gpoResponse.getApplicationFileLocator().getShortFileIdentifier(),
+                            (byte) (gpoResponse.getApplicationFileLocator().getLastRecordNum() - gpoResponse.getApplicationFileLocator().getFirstRecordNum())
+                    );
+                    Log.i("RR RESPONSE", readResponse.toString());
+                } else {
+                    readResponse = readRecordController.readRecord(
+                            (byte)01,
+                            (byte)01,
+                            (byte)00);
+                }
 
-                Log.i("DATA", "Found card " + readResponse.getApplicationData().getCardNumber());
-                Log.i("DATA", "Found expiration year " + readResponse.getApplicationData().getExpirationYear());
-                Log.i("DATA", "Found expiration month " + readResponse.getApplicationData().getExpirationMonth());
-                Log.i("DATA", "Found service code " + readResponse.getApplicationData().getServiceCode());
-                Log.i("DATA", "Found cardholder name " + readResponse.getApplicationData().getCardholderName());
+                if (readResponse.isSuccessfulResponse()) {
+                    CardData cardData = new CardData(readResponse.getApplicationData(),ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0));
+                    Log.i("DATA", cardData.toString());
+                    TextView textView = (TextView)findViewById(R.id.content_text);
+                    textView.setText(cardData.toString());
+                } else {
+                    TextView textView = (TextView)findViewById(R.id.content_text);
+                    textView.setText(readResponse.getStatusWord() + " " + readResponse.getStatusMessage());
+                }
+
 
                 payCardController.disconnect();
 
@@ -107,20 +132,6 @@ public class MainActivity extends AppCompatActivity {
             toast.show();
 
         }
-    }
-
-    private String printByteStream(byte[] stream) {
-        StringBuffer buffer = new StringBuffer();
-        for (byte b : stream) {
-            buffer.append(byteToHexString(b) + " ");
-        }
-        return buffer.toString();
-    }
-
-    private String byteToHexString(byte b) {
-        String hexString = Integer.toHexString(b & 0xff);
-        if (hexString.length() == 1) hexString = "0" + hexString;
-        return hexString;
     }
 
     @Override

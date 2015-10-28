@@ -1,4 +1,4 @@
-package com.qualicom.emvpaycard.model;
+package com.qualicom.emvpaycard.data;
 
 import com.google.gson.annotations.Expose;
 
@@ -26,7 +26,8 @@ public class SelectResponse extends EmvResponse {
             Map<String, byte[]> parsedResponse = new HashMap<String, byte[]>();
             parseTLVResponse(getData(), new String[]{TAG_FCI_TEMPLATE}, parsedResponse);
             if (parsedResponse.containsKey(TAG_FCI_TEMPLATE))
-                this.fciTemplate = new FCITemplate(parsedResponse.get(TAG_FCI_TEMPLATE));
+                //We don't trust the top-level tag.
+                this.fciTemplate = new FCITemplate(getData());
         }
     }
 

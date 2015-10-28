@@ -2,7 +2,7 @@ package com.qualicom.emvpaycard.controller;
 
 import com.qualicom.emvpaycard.EmvPayCardException;
 import com.qualicom.emvpaycard.enums.CommandEnum;
-import com.qualicom.emvpaycard.model.SelectResponse;
+import com.qualicom.emvpaycard.data.SelectResponse;
 import com.qualicom.emvpaycard.utils.Command;
 
 /**

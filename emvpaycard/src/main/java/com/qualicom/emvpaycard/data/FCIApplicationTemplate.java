@@ -1,4 +1,4 @@
-package com.qualicom.emvpaycard.model;
+package com.qualicom.emvpaycard.data;
 
 import com.google.gson.annotations.Expose;
 import com.qualicom.emvpaycard.enums.KernelEnum;
@@ -71,78 +71,5 @@ public class FCIApplicationTemplate extends EmvData {
     public KernelIdentifier getKernelIdentifier() {
         return kernelIdentifier;
     }
-
-    class ApplicationPriorityIndicator implements Comparable<ApplicationPriorityIndicator> {
-
-        @Expose
-        private byte applicationPriorityIndicator = 0x00;
-
-        public ApplicationPriorityIndicator(byte[] applicationPriorityIndicator) {
-            if (applicationPriorityIndicator != null && applicationPriorityIndicator.length > 0) {
-                this.applicationPriorityIndicator = applicationPriorityIndicator[0];
-            }
-        }
-
-        public boolean hasAssignedPriority() {
-            return getApplicationPriority() > 0x00;
-        }
-
-        public byte getApplicationPriorityIndicator() {
-            return applicationPriorityIndicator;
-        }
-
-        public int getApplicationPriority() {
-            return this.applicationPriorityIndicator & 0x0f; //take out all but bits 1-4. All others are reserved for future use.
-        }
-
-        @Override
-        public String toString() {
-            return ByteString.byteToHexString(this.applicationPriorityIndicator);
-        }
-
-        @Override
-        public int compareTo(ApplicationPriorityIndicator another) {
-            return Integer.compare(getApplicationPriority(), another.getApplicationPriority());
-        }
-    }
-
-    class KernelIdentifier {
-
-        @Expose
-        private byte kernelIdentifier = 0;
-
-        public KernelIdentifier(byte[] kernelIdentifier) {
-            if (kernelIdentifier != null && kernelIdentifier.length > 0) {
-                this.kernelIdentifier = kernelIdentifier[0];
-            }
-        }
-
-        public KernelTypeEnum getKernelType() {
-            for (KernelTypeEnum kernel : KernelTypeEnum.values()) {
-                if ((kernelIdentifier & (byte)0xC0) == kernel.getKernelType())
-                    return kernel;
-            }
-            return null;
-        }
-
-        public KernelEnum getKernel() {
-            return KernelEnum.parseValue(kernelIdentifier & 0x3F);
-        }
-
-        public boolean isDefaultKernelForADF() {
-            return getKernel() == KernelEnum.DEFAULT;
-        }
-
-        public byte getKernelIdentifier() {
-            return kernelIdentifier;
-        }
-
-        @Override
-        public String toString() {
-            return ByteString.byteToHexString(this.kernelIdentifier);
-        }
-
-    }
-
 
 }

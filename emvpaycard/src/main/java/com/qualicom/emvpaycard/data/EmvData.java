@@ -1,10 +1,14 @@
-package com.qualicom.emvpaycard.model;
+package com.qualicom.emvpaycard.data;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.annotations.Expose;
 import com.qualicom.emvpaycard.utils.ByteString;
 
-import java.util.ArrayList;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -15,10 +19,26 @@ import java.util.Map;
  */
 public abstract class EmvData {
 
-    private final static Gson gson = new GsonBuilder().
+    protected static GsonBuilder gsonBuilder = new GsonBuilder().
             excludeFieldsWithoutExposeAnnotation().
-            create();
+            setPrettyPrinting().
+            registerTypeAdapter(byte[].class, new JsonSerializer<byte[]>() {
 
+                @Override
+                public JsonElement serialize ( byte[] src, Type typeOfSrc, JsonSerializationContext context)
+                {
+                    return new JsonPrimitive(ByteString.printByteStream(src));
+                }
+            }).
+            registerTypeAdapter(byte.class, new JsonSerializer<Byte>() {
+
+                @Override
+                public JsonElement serialize(Byte src, Type typeOfSrc, JsonSerializationContext context) {
+                    return new JsonPrimitive(ByteString.byteToHexString(src));
+                }
+            });
+
+    @Expose
     private final byte[] raw;
 
     public EmvData(byte[] raw) {
@@ -45,10 +65,10 @@ public abstract class EmvData {
         while (startPos < response.length) {
             prefix.append(ByteString.byteToHexString(response[parsePos++]));
             if (tagSet.contains(prefix.toString())) {
-                int length = response[parsePos++];
-                byte[] data = Arrays.copyOfRange(response, parsePos, parsePos + length);
+                int length = 0xff & response[parsePos++];
+                byte[] data = Arrays.copyOfRange(response, parsePos, Math.min(response.length, parsePos + length));
                 parsedResponse.put(prefix.toString(), data);
-                startPos = parsePos = parsePos + length;
+                startPos = parsePos = Math.min(response.length, parsePos + length);
                 prefix = new StringBuffer();
             } else {
                 if (parsePos >= response.length) {
@@ -66,10 +86,10 @@ public abstract class EmvData {
         while (startPos < response.length) {
             prefix.append(ByteString.byteToHexString(response[parsePos++]));
             if (tag.contains(prefix.toString())) {
-                int length = response[parsePos++];
-                byte[] data = Arrays.copyOfRange(response, parsePos, parsePos + length);
+                int length = 0xff & response[parsePos++];
+                byte[] data = Arrays.copyOfRange(response, parsePos, Math.min(response.length, parsePos + length));
                 parsedList.add(data);
-                startPos = parsePos = parsePos + length;
+                startPos = parsePos = Math.min(response.length, parsePos + length);
                 prefix = new StringBuffer();
             } else {
                 if (parsePos >= response.length) {
@@ -80,8 +100,14 @@ public abstract class EmvData {
         }
     }
 
+    protected int getMaskedValue(int byteIndex, int mask) {
+        if (getRaw() != null && getRaw().length > byteIndex)
+            return (0xff & getRaw()[byteIndex] & mask);
+        return 0;
+    }
+
     public String toString() {
-        return gson.toJson(this);
+        return gsonBuilder.create().toJson(this);
     }
 
 }

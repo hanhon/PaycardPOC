@@ -17,7 +17,7 @@ public class ByteString {
                 buffer.append(byteToHexString(b) + " ");
             }
         }
-        return buffer.toString();
+        return buffer.toString().trim();
     }
 
     public static String byteArrayToHexString(byte[] stream) {
@@ -39,7 +39,7 @@ public class ByteString {
     }
 
     public static String byteToHexString(byte b) {
-        String hexString = Integer.toHexString(b & 0xff); //Take care of the sign bit.
+        String hexString = Integer.toHexString(0xff & b); //Take care of the sign bit.
         if (hexString.length() == 1) hexString = "0" + hexString;
         return hexString.toUpperCase();
     }

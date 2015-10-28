@@ -22,7 +22,6 @@ public enum StatusWordEnum {
     RC_6581("6581", "Memory error (e.g. during write operation).", StatusClassifierEnum.EXECUTION_ERROR),
     RC_65XX("65[0-9A-F]{2}", "Execution error, state of non-volatile memory changed.", StatusClassifierEnum.EXECUTION_ERROR),
     RC_67XX("67[0-9A-F]{2}", "Length incorrect.", StatusClassifierEnum.CHECK_ERROR),
-    RC_67_6F_XX("6[7-9A-F][0-9A-F]{2}", "Checked error.", StatusClassifierEnum.CHECK_ERROR),
     RC_6800("6800", "Functions in the class byte not supported.", StatusClassifierEnum.CHECK_ERROR),
     RC_6881("6881", "Logical channels not supported.", StatusClassifierEnum.CHECK_ERROR),
     RC_6882("6882", "Secure messaging not supported.", StatusClassifierEnum.CHECK_ERROR),
@@ -46,10 +45,11 @@ public enum StatusWordEnum {
     RC_6A87("6A87", "Lc inconsistent with P1 or P2 parameter.", StatusClassifierEnum.CHECK_ERROR),
     RC_6A88("6A88", "Referenced data not found.", StatusClassifierEnum.CHECK_ERROR),
     RC_6B00("6B00", "Parameter 1 or 2 incorrect.", StatusClassifierEnum.CHECK_ERROR),
-    RC_6CXX("6CXX", "Bad length value in Le; %d is the correct length.", StatusClassifierEnum.CHECK_ERROR),
+    RC_6CXX("6C[0-9A-F]{2}", "Bad length value in Le; %d is the correct length.", StatusClassifierEnum.CHECK_ERROR),
     RC_6D00("6D00", "Command (instruction) not supported.", StatusClassifierEnum.CHECK_ERROR),
     RC_6E00("6E00", "Class not supported.", StatusClassifierEnum.CHECK_ERROR),
     RC_6F00("6F00", "Command aborted - more exact diagnosis not possible (e.g. OS error).", StatusClassifierEnum.CHECK_ERROR),
+    RC_67_6F_XX("6[7-9A-F][0-9A-F]{2}", "Checked error.", StatusClassifierEnum.CHECK_ERROR),
     RC_9000("9000", "Command successfully executed.", StatusClassifierEnum.PROCESS_COMPLETED),
     UNKNOWN("*", "Unknown status word value. No troubleshooting information available.", null);
 

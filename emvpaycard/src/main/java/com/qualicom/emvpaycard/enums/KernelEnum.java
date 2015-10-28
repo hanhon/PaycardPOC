@@ -11,7 +11,7 @@ package com.qualicom.emvpaycard.enums;
 public enum KernelEnum {
 
     DEFAULT(0), //DEFAULT or OTHER - this is the "no value" constant.
-    TYPE_1(1), //??? No clue.
+    TYPE_1(1), //Some VISA and some JCB cards
     TYPE_2(2), //Mastercard
     TYPE_3(3), //Visa
     TYPE_4(4), //American Express

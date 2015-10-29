@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
                     for (FCIApplicationTemplate ddfAppTemplate : ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData()) {
                         buffer.append("\n --- START APPLICATION --- \n");
                         String appId = ddfAppTemplate.getAdfName();
-                        SelectResponse appResponse = selectCommand.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
-                        Log.i("APP RESPONSE", appResponse.toString());
+                        SelectResponse adfResponse = selectCommand.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
+                        Log.i("ADF RESPONSE", adfResponse.toString());
 
                         //Read the GPO for the application selected using an empty PDOL.
                         GetProcessingOptionsCommand gpoController = new GetProcessingOptionsCommand(payCardCommand);
@@ -123,7 +123,11 @@ public class MainActivity extends AppCompatActivity {
                         //Print everything.
                         for(ReadResponse readResponse : readResponses) {
                             if (readResponse.isSuccessfulResponse()) {
-                                CardData cardData = new CardData(readResponse.getApplicationData(), ddfResponse.getFciTemplate().getFciProprietaryTemplate(), ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0), appResponse.getFciTemplate().getFciProprietaryTemplate());
+                                CardData cardData = new CardData(
+                                        readResponse.getApplicationData(),
+                                        ddfResponse.getFciTemplate().getFciProprietaryTemplate(),
+                                        ddfAppTemplate,
+                                        adfResponse.getFciTemplate().getFciProprietaryTemplate());
                                 Log.i("DATA", cardData.toString());
                                 buffer.append("\n >>> START RECORD: \n" + cardData.toString() + "\n >>> END RECORD \n");
                             } else {

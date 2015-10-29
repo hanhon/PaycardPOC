@@ -69,22 +69,22 @@ public class CardData extends BusinessObject {
     private final ApplicationData appData;
     private final FCIProprietaryTemplate ddfFCIProprietaryTemplate;
     private final FCIApplicationTemplate appTemplateData;
-    private final FCIProprietaryTemplate appFCIProprietaryTemplate;
+    private final FCIProprietaryTemplate adfFCIProprietaryTemplate;
 
     /**
      *
      * @param appData the application data returned by the read record operation
      * @param ddfFCIProprietaryResponse the FCI Proprietary Response from the Select DDF operation.
      * @param selectedApplicationTemplateData The selected application template data from the Select DDF response.
-     * @param appFCIProprietaryTemplate The FCI Proprietary Response from the Select APP operation.
+     * @param adfFCIProprietaryTemplate The FCI Proprietary Response from the Select APP operation.
      */
-    public CardData(ApplicationData appData, FCIProprietaryTemplate ddfFCIProprietaryResponse, FCIApplicationTemplate selectedApplicationTemplateData, FCIProprietaryTemplate appFCIProprietaryTemplate) throws EmvPayCardException {
-        if (appData == null || ddfFCIProprietaryResponse == null || selectedApplicationTemplateData == null || appFCIProprietaryTemplate == null)
+    public CardData(ApplicationData appData, FCIProprietaryTemplate ddfFCIProprietaryResponse, FCIApplicationTemplate selectedApplicationTemplateData, FCIProprietaryTemplate adfFCIProprietaryTemplate) throws EmvPayCardException {
+        if (appData == null || ddfFCIProprietaryResponse == null || selectedApplicationTemplateData == null || adfFCIProprietaryTemplate == null)
             throw new EmvPayCardException("Insufficient or invalid data.");
         this.appData = appData;
         this.ddfFCIProprietaryTemplate = ddfFCIProprietaryResponse;
         this.appTemplateData = selectedApplicationTemplateData;
-        this.appFCIProprietaryTemplate = appFCIProprietaryTemplate;
+        this.adfFCIProprietaryTemplate = adfFCIProprietaryTemplate;
     }
 
     public String getAppName() {
@@ -96,7 +96,7 @@ public class CardData extends BusinessObject {
     }
 
     public String getAppPreferredName() {
-        return appFCIProprietaryTemplate.getApplicationPreferredName();
+        return adfFCIProprietaryTemplate.getApplicationPreferredName();
     }
 
     public CardSchemeEnum getCardSchemeEnum() {
@@ -202,15 +202,15 @@ public class CardData extends BusinessObject {
     }
 
     public String getIssuerCountryCode() {
-        if (appFCIProprietaryTemplate.getIssuerDiscretionaryData() != null)
-            return appFCIProprietaryTemplate.getIssuerDiscretionaryData().getIssuerCountryCode();
+        if (adfFCIProprietaryTemplate.getIssuerDiscretionaryData() != null)
+            return adfFCIProprietaryTemplate.getIssuerDiscretionaryData().getIssuerCountryCode();
         return null;
     }
 
     public String getCardLanguage() {
         String lang = ddfFCIProprietaryTemplate.getLanguagePreference();
-        if (!TextUtils.isEmpty(appFCIProprietaryTemplate.getLanguagePreference()))
-            lang = appFCIProprietaryTemplate.getLanguagePreference();
+        if (!TextUtils.isEmpty(adfFCIProprietaryTemplate.getLanguagePreference()))
+            lang = adfFCIProprietaryTemplate.getLanguagePreference();
         return lang;
     }
 

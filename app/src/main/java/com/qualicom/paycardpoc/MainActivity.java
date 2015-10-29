@@ -86,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
                 PayCardCommand payCardCommand = new PayCardCommand(tag);
                 payCardCommand.connect();
                 SelectCommand selectCommand = new SelectCommand(payCardCommand);
-                SelectResponse pseResponse = selectCommand.selectPSE();
-                Log.i("PSE RESPONSE", pseResponse.toString());
+//                SelectResponse pseResponse = selectCommand.selectPSE();
+//                Log.i("PSE RESPONSE", pseResponse.toString());
                 SelectResponse ddfResponse = selectCommand.selectDDF(SelectCommand.PPSE);
                 Log.i("DDF RESPONSE", ddfResponse.toString());
                 String appId = ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0).getAdfName();

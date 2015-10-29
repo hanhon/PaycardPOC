@@ -49,7 +49,7 @@ public enum StatusWordEnum {
     RC_6D00("6D00", "Command (instruction) not supported.", StatusClassifierEnum.CHECK_ERROR),
     RC_6E00("6E00", "Class not supported.", StatusClassifierEnum.CHECK_ERROR),
     RC_6F00("6F00", "Command aborted - more exact diagnosis not possible (e.g. OS error).", StatusClassifierEnum.CHECK_ERROR),
-    RC_67_6F_XX("6[7-9A-F][0-9A-F]{2}", "Checked error.", StatusClassifierEnum.CHECK_ERROR),
+    RC_67_6F_XX("6[7-9A-F][0-9A-F]{2}", "Generic checked error.", StatusClassifierEnum.CHECK_ERROR),
     RC_9000("9000", "Command successfully executed.", StatusClassifierEnum.PROCESS_COMPLETED),
     UNKNOWN("*", "Unknown status word value. No troubleshooting information available.", null);
 

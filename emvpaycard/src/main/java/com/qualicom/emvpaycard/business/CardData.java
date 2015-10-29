@@ -13,7 +13,6 @@ import com.qualicom.emvpaycard.data.FCIProprietaryTemplate;
 import com.qualicom.emvpaycard.data.KernelIdentifier;
 import com.qualicom.emvpaycard.enums.CardSchemeEnum;
 import com.qualicom.emvpaycard.enums.KernelEnum;
-import com.qualicom.emvpaycard.enums.StatusClassifierEnum;
 
 import java.lang.reflect.Type;
 
@@ -76,7 +75,7 @@ public class CardData extends BusinessObject {
      * @param appData the application data returned by the read record operation
      * @param ddfFCIProprietaryResponse the FCI Proprietary Response from the Select DDF operation.
      * @param selectedApplicationTemplateData The selected application template data from the Select DDF response.
-     * @param adfFCIProprietaryTemplate The FCI Proprietary Response from the Select APP operation.
+     * @param adfFCIProprietaryTemplate The FCI Proprietary Response from the Select ADF operation.
      */
     public CardData(ApplicationData appData, FCIProprietaryTemplate ddfFCIProprietaryResponse, FCIApplicationTemplate selectedApplicationTemplateData, FCIProprietaryTemplate adfFCIProprietaryTemplate) throws EmvPayCardException {
         if (appData == null || ddfFCIProprietaryResponse == null || selectedApplicationTemplateData == null || adfFCIProprietaryTemplate == null)

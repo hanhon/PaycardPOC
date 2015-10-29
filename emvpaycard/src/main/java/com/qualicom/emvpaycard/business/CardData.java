@@ -72,9 +72,10 @@ public class CardData extends BusinessObject {
 
     /**
      *
-     * @param appData the application data from the read record operation
-     * @param selectedApplicationTemplateData the application template data from the Select DDF Response
-     * @param appFCIProprietaryTemplate the FCI proprietary template data from the Select APP Response
+     * @param appData the application data returned by the read record operation
+     * @param ddfFCIProprietaryResponse the FCI Proprietary Response from the Select DDF operation.
+     * @param selectedApplicationTemplateData The selected application template data from the Select DDF response.
+     * @param appFCIProprietaryTemplate The FCI Proprietary Response from the Select APP operation.
      */
     public CardData(ApplicationData appData, FCIProprietaryTemplate ddfFCIProprietaryResponse, FCIApplicationTemplate selectedApplicationTemplateData, FCIProprietaryTemplate appFCIProprietaryTemplate) {
         this.appData = appData;
@@ -198,7 +199,9 @@ public class CardData extends BusinessObject {
     }
 
     public String getIssuerCountryCode() {
-         return appFCIProprietaryTemplate.getIssuerDiscretionaryData().getIssuerCountryCode();
+        if (appFCIProprietaryTemplate.getIssuerDiscretionaryData() != null)
+            return appFCIProprietaryTemplate.getIssuerDiscretionaryData().getIssuerCountryCode();
+        return null;
     }
 
     public String getCardLanguage() {

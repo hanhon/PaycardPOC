@@ -50,13 +50,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-/*    @Override
+    @Override
     protected void onResume() {
         super.onResume();
         Intent intent = getIntent();
         handleIntent(intent);
-    }*/
-
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -64,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         handleIntent(intent);
     }
 
-    private void handleIntent(Intent intent) {
+    private synchronized void handleIntent(Intent intent) {
         if (intent != null && NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
             Tag tag = (Tag)intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             Toast toast = null;

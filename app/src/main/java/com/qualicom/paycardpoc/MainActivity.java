@@ -50,87 +50,85 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
+/*    @Override
     protected void onResume() {
         super.onResume();
         Intent intent = getIntent();
-        try {
-            handleIntent(intent);
-        } catch (EmvPayCardException e) {
-            e.printStackTrace();
-        }
-    }
+        handleIntent(intent);
+    }*/
 
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        try {
-            handleIntent(intent);
-        } catch (EmvPayCardException e) {
-            e.printStackTrace();
-        }
+        handleIntent(intent);
     }
 
-    private void handleIntent(Intent intent) throws EmvPayCardException {
+    private void handleIntent(Intent intent) {
         if (intent != null && NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
             Tag tag = (Tag)intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             Toast toast = null;
 
-            if (PayCardUtils.isValidEmvPayCard(tag)) {
-                if (PayCardUtils.isTypeAPayCard(tag))
-                    toast = Toast.makeText(this, "This is a valid NFC type A payment card.", Toast.LENGTH_SHORT);
-                if (PayCardUtils.isTypeBPayCard(tag))
-                    toast = Toast.makeText(this, "This is a valid NFC type A payment card.", Toast.LENGTH_SHORT);
+            try {
+                if (PayCardUtils.isValidEmvPayCard(tag)) {
+                    if (PayCardUtils.isTypeAPayCard(tag))
+                        toast = Toast.makeText(this, "This is a valid NFC type A payment card.", Toast.LENGTH_SHORT);
+                    if (PayCardUtils.isTypeBPayCard(tag))
+                        toast = Toast.makeText(this, "This is a valid NFC type A payment card.", Toast.LENGTH_SHORT);
 
-                PayCardCommand payCardCommand = new PayCardCommand(tag);
-                payCardCommand.connect();
-                SelectCommand selectCommand = new SelectCommand(payCardCommand);
+                    PayCardCommand payCardCommand = new PayCardCommand(tag);
+                    payCardCommand.connect();
+                    SelectCommand selectCommand = new SelectCommand(payCardCommand);
 //                SelectResponse pseResponse = selectCommand.selectPSE();
 //                Log.i("PSE RESPONSE", pseResponse.toString());
-                SelectResponse ddfResponse = selectCommand.selectDDF(SelectCommand.PPSE);
-                Log.i("DDF RESPONSE", ddfResponse.toString());
-                String appId = ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0).getAdfName();
-                SelectResponse appResponse = selectCommand.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
-                Log.i("APP RESPONSE", appResponse.toString());
+                    SelectResponse ddfResponse = selectCommand.selectDDF(SelectCommand.PPSE);
+                    Log.i("DDF RESPONSE", ddfResponse.toString());
+                    String appId = ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0).getAdfName();
+                    SelectResponse appResponse = selectCommand.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
+                    Log.i("APP RESPONSE", appResponse.toString());
 
-                GetProcessingOptionsCommand gpoController = new GetProcessingOptionsCommand(payCardCommand);
-                GetProcessingOptionsResponse gpoResponse = gpoController.getApplicationProfile("8300");
-                Log.i("GPO RESPONSE", gpoResponse.toString());
+                    GetProcessingOptionsCommand gpoController = new GetProcessingOptionsCommand(payCardCommand);
+                    GetProcessingOptionsResponse gpoResponse = gpoController.getApplicationProfile("8300");
+                    Log.i("GPO RESPONSE", gpoResponse.toString());
 
-                ReadRecordCommand readRecordCommand = new ReadRecordCommand(payCardCommand);
-                ReadResponse readResponse = null;
-                if (gpoResponse.isSuccessfulResponse()) {
-                    readResponse = readRecordCommand.readRecord(
-                            gpoResponse.getApplicationFileLocator().getFirstRecordNum(),
-                            gpoResponse.getApplicationFileLocator().getShortFileIdentifier(),
-                            (byte) (gpoResponse.getApplicationFileLocator().getLastRecordNum() - gpoResponse.getApplicationFileLocator().getFirstRecordNum())
-                    );
-                    Log.i("RR RESPONSE", readResponse.toString());
-                } else {
-                    readResponse = readRecordCommand.readRecord(
-                            (byte)01,
-                            (byte)01,
-                            (byte)00);
-                }
+                    ReadRecordCommand readRecordCommand = new ReadRecordCommand(payCardCommand);
+                    ReadResponse readResponse = null;
+                    if (gpoResponse.isSuccessfulResponse()) {
+                        readResponse = readRecordCommand.readRecord(
+                                gpoResponse.getApplicationFileLocator().getFirstRecordNum(),
+                                gpoResponse.getApplicationFileLocator().getShortFileIdentifier(),
+                                (byte) (gpoResponse.getApplicationFileLocator().getLastRecordNum() - gpoResponse.getApplicationFileLocator().getFirstRecordNum())
+                        );
+                        Log.i("RR RESPONSE", readResponse.toString());
+                    } else {
+                        readResponse = readRecordCommand.readRecord(
+                                (byte) 01,
+                                (byte) 01,
+                                (byte) 00);
+                    }
 
-                if (readResponse.isSuccessfulResponse()) {
-                    CardData cardData = new CardData(readResponse.getApplicationData(),ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0));
-                    Log.i("DATA", cardData.toString());
-                    TextView textView = (TextView)findViewById(R.id.content_text);
-                    textView.setText(cardData.toString());
-                } else {
-                    TextView textView = (TextView)findViewById(R.id.content_text);
-                    textView.setText(readResponse.getStatusWord() + " " + readResponse.getStatusMessage());
-                }
+                    if (readResponse.isSuccessfulResponse()) {
+                        CardData cardData = new CardData(readResponse.getApplicationData(), ddfResponse.getFciTemplate().getFciProprietaryTemplate(), ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0), appResponse.getFciTemplate().getFciProprietaryTemplate());
+                        Log.i("DATA", cardData.toString());
+                        TextView textView = (TextView) findViewById(R.id.content_text);
+                        textView.setText(cardData.toString());
+                    } else {
+                        TextView textView = (TextView) findViewById(R.id.content_text);
+                        textView.setText(readResponse.getStatusWord() + " " + readResponse.getStatusMessage());
+                    }
 
 
-                payCardCommand.disconnect();
+                    payCardCommand.disconnect();
 
-            } else
-                toast = Toast.makeText(this, "This is an invalid or unknown payment card.", Toast.LENGTH_SHORT);
-            toast.show();
-
+                } else
+                    toast = Toast.makeText(this, "This is an invalid or unknown payment card.", Toast.LENGTH_SHORT);
+                toast.show();
+            } catch (EmvPayCardException e) {
+                Log.e("ERROR",e.getMessage());
+                TextView textView = (TextView) findViewById(R.id.content_text);
+                textView.setText(e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 

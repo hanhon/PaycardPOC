@@ -32,7 +32,7 @@ public class ApplicationFileLocator extends EmvData {
 
     public ApplicationFileLocator(byte[] response) throws EmvPayCardException {
         super(response);
-        if (response != null && response.length < 5)
+        if (response != null && response.length > 0 && response.length % 4 != 0) //AFL is always non-empty and a multiple of 4 bytes.
             throw new EmvPayCardException("Invalid Application File Locator passed.");
 
     }

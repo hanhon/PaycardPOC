@@ -8,6 +8,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.qualicom.emvpaycard.data.ApplicationData;
 import com.qualicom.emvpaycard.data.FCIApplicationTemplate;
+import com.qualicom.emvpaycard.data.FCIProprietaryTemplate;
 import com.qualicom.emvpaycard.data.KernelIdentifier;
 import com.qualicom.emvpaycard.enums.CardSchemeEnum;
 import com.qualicom.emvpaycard.enums.KernelEnum;
@@ -28,6 +29,7 @@ public class CardData extends BusinessObject {
                 JsonObject obj = new JsonObject();
                 obj.add("appName",context.serialize(src.getAppName()));
                 obj.add("appLabel",context.serialize(src.getAppLabel()));
+                obj.add("appPreferredName", context.serialize(src.getAppPreferredName()));
                 obj.add("cardScheme",context.serialize(src.getCardSchemeEnum()));
                 obj.add("track1",context.serialize(src.getTrack1()));
                 obj.add("track2",context.serialize(src.getTrack2()));
@@ -38,6 +40,8 @@ public class CardData extends BusinessObject {
                 obj.add("expirationYear",context.serialize(src.getExpirationYear()));
                 obj.add("serviceCode",context.serialize(src.getServiceCode()));
                 obj.add("cardholderName",context.serialize(src.getCardholderName()));
+                obj.add("cardLanguage",context.serialize(src.getCardLanguage()));
+                obj.add("issuerCountryCode",context.serialize(src.getIssuerCountryCode()));
                 obj.add("selectedPaymentKernelId",context.serialize(src.getPaymentKernelEnum()));
                 return obj;
             }
@@ -62,11 +66,21 @@ public class CardData extends BusinessObject {
     private static final String TRACK2_SENTINELS_AND_SEPARATORS = "[;=DF\\?]";
 
     private final ApplicationData appData;
+    private final FCIProprietaryTemplate ddfFCIProprietaryTemplate;
     private final FCIApplicationTemplate appTemplateData;
+    private final FCIProprietaryTemplate appFCIProprietaryTemplate;
 
-    public CardData(ApplicationData appData, FCIApplicationTemplate applicationTemplateData) {
+    /**
+     *
+     * @param appData the application data from the read record operation
+     * @param selectedApplicationTemplateData the application template data from the Select DDF Response
+     * @param appFCIProprietaryTemplate the FCI proprietary template data from the Select APP Response
+     */
+    public CardData(ApplicationData appData, FCIProprietaryTemplate ddfFCIProprietaryResponse, FCIApplicationTemplate selectedApplicationTemplateData, FCIProprietaryTemplate appFCIProprietaryTemplate) {
         this.appData = appData;
-        this.appTemplateData = applicationTemplateData;
+        this.ddfFCIProprietaryTemplate = ddfFCIProprietaryResponse;
+        this.appTemplateData = selectedApplicationTemplateData;
+        this.appFCIProprietaryTemplate = appFCIProprietaryTemplate;
     }
 
     public String getAppName() {
@@ -75,6 +89,10 @@ public class CardData extends BusinessObject {
 
     public String getAppLabel() {
         return appTemplateData.getApplicationLabel();
+    }
+
+    public String getAppPreferredName() {
+        return appFCIProprietaryTemplate.getApplicationPreferredName();
     }
 
     public CardSchemeEnum getCardSchemeEnum() {
@@ -179,5 +197,15 @@ public class CardData extends BusinessObject {
             return kernelIdentifier.getKernel();
     }
 
+    public String getIssuerCountryCode() {
+         return appFCIProprietaryTemplate.getIssuerDiscretionaryData().getIssuerCountryCode();
+    }
+
+    public String getCardLanguage() {
+        String lang = ddfFCIProprietaryTemplate.getLanguagePreference();
+        if (!TextUtils.isEmpty(appFCIProprietaryTemplate.getLanguagePreference()))
+            lang = appFCIProprietaryTemplate.getLanguagePreference();
+        return lang;
+    }
 
 }

@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.qualicom.emvpaycard.EmvPayCardException;
 import com.qualicom.emvpaycard.data.ApplicationData;
 import com.qualicom.emvpaycard.data.FCIApplicationTemplate;
 import com.qualicom.emvpaycard.data.FCIProprietaryTemplate;
@@ -77,7 +78,9 @@ public class CardData extends BusinessObject {
      * @param selectedApplicationTemplateData The selected application template data from the Select DDF response.
      * @param appFCIProprietaryTemplate The FCI Proprietary Response from the Select APP operation.
      */
-    public CardData(ApplicationData appData, FCIProprietaryTemplate ddfFCIProprietaryResponse, FCIApplicationTemplate selectedApplicationTemplateData, FCIProprietaryTemplate appFCIProprietaryTemplate) {
+    public CardData(ApplicationData appData, FCIProprietaryTemplate ddfFCIProprietaryResponse, FCIApplicationTemplate selectedApplicationTemplateData, FCIProprietaryTemplate appFCIProprietaryTemplate) throws EmvPayCardException {
+        if (appData == null || ddfFCIProprietaryResponse == null || selectedApplicationTemplateData == null || appFCIProprietaryTemplate == null)
+            throw new EmvPayCardException("Insufficient or invalid data.");
         this.appData = appData;
         this.ddfFCIProprietaryTemplate = ddfFCIProprietaryResponse;
         this.appTemplateData = selectedApplicationTemplateData;

@@ -6,6 +6,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.annotations.Expose;
+import com.qualicom.emvpaycard.EmvPayCardException;
 import com.qualicom.emvpaycard.utils.ByteString;
 
 import java.lang.reflect.Type;
@@ -64,7 +65,7 @@ public abstract class EmvData {
         StringBuffer prefix = new StringBuffer();
         while (startPos < response.length) {
             prefix.append(ByteString.byteToHexString(response[parsePos++]));
-            if (tagSet.contains(prefix.toString())) {
+            if (parsePos < response.length && tagSet.contains(prefix.toString())) {
                 int length = 0xff & response[parsePos++];
                 byte[] data = Arrays.copyOfRange(response, parsePos, Math.min(response.length, parsePos + length));
                 parsedResponse.put(prefix.toString(), data);
@@ -85,7 +86,7 @@ public abstract class EmvData {
         StringBuffer prefix = new StringBuffer();
         while (startPos < response.length) {
             prefix.append(ByteString.byteToHexString(response[parsePos++]));
-            if (tag.contains(prefix.toString())) {
+            if (parsePos < response.length && tag.contains(prefix.toString())) {
                 int length = 0xff & response[parsePos++];
                 byte[] data = Arrays.copyOfRange(response, parsePos, Math.min(response.length, parsePos + length));
                 parsedList.add(data);
@@ -100,9 +101,9 @@ public abstract class EmvData {
         }
     }
 
-    protected int getMaskedValue(int byteIndex, int mask) {
+    protected byte getMaskedValue(int byteIndex, int mask) {
         if (getRaw() != null && getRaw().length > byteIndex)
-            return (0xff & getRaw()[byteIndex] & mask);
+            return (byte)(0xff & getRaw()[byteIndex] & mask);
         return 0;
     }
 

@@ -1,6 +1,7 @@
 package com.qualicom.emvpaycard.command;
 
 import com.qualicom.emvpaycard.EmvPayCardException;
+import com.qualicom.emvpaycard.data.ApplicationFileLocatorRange;
 import com.qualicom.emvpaycard.enums.CommandEnum;
 import com.qualicom.emvpaycard.data.ReadResponse;
 import com.qualicom.emvpaycard.utils.Command;
@@ -21,6 +22,14 @@ public class ReadRecordCommand extends AbstractCommand {
         Command readRecordCommand = new Command(CommandEnum.READ_RECORD, recordNum, sfi << 3 | 0x04, len);
         byte[] response = getPayCardCommand().transcieve(readRecordCommand);
         return new ReadResponse(response);
+    }
+
+    public ReadResponse readRecord(ApplicationFileLocatorRange recordRange) throws EmvPayCardException {
+        return readRecord(
+                recordRange.getStartRecord(),
+                recordRange.getShortFileIdentifier(),
+                recordRange.getLength());
+
     }
 
 }

@@ -21,11 +21,16 @@ import com.qualicom.emvpaycard.command.GetProcessingOptionsCommand;
 import com.qualicom.emvpaycard.command.PayCardCommand;
 import com.qualicom.emvpaycard.command.ReadRecordCommand;
 import com.qualicom.emvpaycard.command.SelectCommand;
+import com.qualicom.emvpaycard.data.ApplicationFileLocatorRange;
+import com.qualicom.emvpaycard.data.FCIApplicationTemplate;
 import com.qualicom.emvpaycard.data.GetProcessingOptionsResponse;
 import com.qualicom.emvpaycard.data.ReadResponse;
 import com.qualicom.emvpaycard.data.SelectResponse;
 import com.qualicom.emvpaycard.utils.ByteString;
 import com.qualicom.emvpaycard.utils.PayCardUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,44 +83,55 @@ public class MainActivity extends AppCompatActivity {
                     PayCardCommand payCardCommand = new PayCardCommand(tag);
                     payCardCommand.connect();
                     SelectCommand selectCommand = new SelectCommand(payCardCommand);
-//                SelectResponse pseResponse = selectCommand.selectPSE();
-//                Log.i("PSE RESPONSE", pseResponse.toString());
                     SelectResponse ddfResponse = selectCommand.selectDDF(SelectCommand.PPSE);
                     Log.i("DDF RESPONSE", ddfResponse.toString());
-                    String appId = ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0).getAdfName();
-                    SelectResponse appResponse = selectCommand.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
-                    Log.i("APP RESPONSE", appResponse.toString());
 
-                    GetProcessingOptionsCommand gpoController = new GetProcessingOptionsCommand(payCardCommand);
-                    GetProcessingOptionsResponse gpoResponse = gpoController.getApplicationProfile("8300");
-                    Log.i("GPO RESPONSE", gpoResponse.toString());
+                    StringBuffer buffer = new StringBuffer();
 
-                    ReadRecordCommand readRecordCommand = new ReadRecordCommand(payCardCommand);
-                    ReadResponse readResponse = null;
-                    if (gpoResponse.isSuccessfulResponse()) {
-                        readResponse = readRecordCommand.readRecord(
-                                gpoResponse.getApplicationFileLocator().getFirstRecordNum(),
-                                gpoResponse.getApplicationFileLocator().getShortFileIdentifier(),
-                                (byte) (gpoResponse.getApplicationFileLocator().getLastRecordNum() - gpoResponse.getApplicationFileLocator().getFirstRecordNum())
-                        );
-                        Log.i("RR RESPONSE", readResponse.toString());
-                    } else {
-                        readResponse = readRecordCommand.readRecord(
-                                (byte) 01,
-                                (byte) 01,
-                                (byte) 00);
+                    for (FCIApplicationTemplate ddfAppTemplate : ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData()) {
+                        buffer.append("\n --- START APPLICATION --- \n");
+                        String appId = ddfAppTemplate.getAdfName();
+                        SelectResponse appResponse = selectCommand.selectADF(ByteString.hexStringToByteArray(appId)); //Mastercard.
+                        Log.i("APP RESPONSE", appResponse.toString());
+
+                        //Read the GPO for the application selected using an empty PDOL.
+                        GetProcessingOptionsCommand gpoController = new GetProcessingOptionsCommand(payCardCommand);
+                        GetProcessingOptionsResponse gpoResponse = gpoController.getApplicationProfile("8300");
+                        Log.i("GPO RESPONSE", gpoResponse.toString());
+
+                        //Read every record range returned by GPO above.
+                        ReadRecordCommand readRecordCommand = new ReadRecordCommand(payCardCommand);
+                        List<ReadResponse> readResponses = new ArrayList<ReadResponse>();
+
+                        if (gpoResponse.isSuccessfulResponse()) {
+                            for (ApplicationFileLocatorRange range : gpoResponse.getApplicationFileLocator().getRecordRanges()) {
+                                ReadResponse readResponse = readRecordCommand.readRecord(range);
+                                readResponses.add(readResponse);
+                                Log.i("RR RESPONSE", readResponse.toString());
+                            }
+                        } else {
+                            readResponses.add(readRecordCommand.readRecord(
+                                    (byte) 01,
+                                    (byte) 01,
+                                    (byte) 00));
+                        }
+
+                        //Print everything.
+                        for(ReadResponse readResponse : readResponses) {
+                            if (readResponse.isSuccessfulResponse()) {
+                                CardData cardData = new CardData(readResponse.getApplicationData(), ddfResponse.getFciTemplate().getFciProprietaryTemplate(), ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0), appResponse.getFciTemplate().getFciProprietaryTemplate());
+                                Log.i("DATA", cardData.toString());
+                                buffer.append("\n >>> START RECORD: \n" + cardData.toString() + "\n >>> END RECORD \n");
+                            } else {
+                                buffer.append("\n >>> START RECORD: \n" + readResponse.getStatusWord() + " " + readResponse.getStatusMessage() + "\n >>> END RECORD \n");
+                            }
+                        }
+                        buffer.append("\n --- END APPLICATION --- \n");
                     }
 
-                    if (readResponse.isSuccessfulResponse()) {
-                        CardData cardData = new CardData(readResponse.getApplicationData(), ddfResponse.getFciTemplate().getFciProprietaryTemplate(), ddfResponse.getFciTemplate().getFciProprietaryTemplate().getIssuerDiscretionaryData().getApplicationTemplateData().get(0), appResponse.getFciTemplate().getFciProprietaryTemplate());
-                        Log.i("DATA", cardData.toString());
-                        TextView textView = (TextView) findViewById(R.id.content_text);
-                        textView.setText(cardData.toString());
-                    } else {
-                        TextView textView = (TextView) findViewById(R.id.content_text);
-                        textView.setText(readResponse.getStatusWord() + " " + readResponse.getStatusMessage());
-                    }
 
+                    TextView textView = (TextView) findViewById(R.id.content_text);
+                    textView.setText(buffer.toString());
 
                     payCardCommand.disconnect();
 

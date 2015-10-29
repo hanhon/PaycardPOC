@@ -110,10 +110,14 @@ public class MainActivity extends AppCompatActivity {
                                 Log.i("RR RESPONSE", readResponse.toString());
                             }
                         } else {
-                            readResponses.add(readRecordCommand.readRecord(
+                            buffer.append(" !!! GPO returns error. Attempting to guess application records to read.");
+                            ReadResponse readResponse = readRecordCommand.readRecord(
                                     (byte) 01,
                                     (byte) 01,
-                                    (byte) 00));
+                                    (byte) 00);
+                            readResponses.add(readResponse);
+                            Log.i("RR RESPONSE", readResponse.toString());
+
                         }
 
                         //Print everything.
